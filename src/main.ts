@@ -46,5 +46,6 @@ async function bootstrap() {
   await app.listen(3001)
   logger.log("🚀 Server running on http://localhost:3001")
   logger.log("📚 API Documentation: http://localhost:3001/api")
+   logger.log("🗄️ Database: PostgreSQL with Sequelize")
 }
 bootstrap()
