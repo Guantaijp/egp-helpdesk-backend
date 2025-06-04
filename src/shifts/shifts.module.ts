@@ -1,11 +1,11 @@
 import { Module } from "@nestjs/common"
-import { TypeOrmModule } from "@nestjs/typeorm"
+import { SequelizeModule } from "@nestjs/sequelize"
 import { ShiftsService } from "./shifts.service"
 import { ShiftsController } from "./shifts.controller"
-import { Shift } from "./entities/shift.entity"
+import { Shift } from "./models/shift.model"
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Shift])],
+ imports: [SequelizeModule.forFeature([Shift])],
   controllers: [ShiftsController],
   providers: [ShiftsService],
   exports: [ShiftsService],

@@ -12,9 +12,5 @@ import { DatabaseModule } from "./database/database.module"
     ShiftsModule,
   ],
 })
-export class AppModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-    // configure middleware here if needed
-  }
-}
+export class AppModule {}
 

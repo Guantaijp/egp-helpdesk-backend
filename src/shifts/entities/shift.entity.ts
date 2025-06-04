@@ -8,6 +8,9 @@ import {
 
 @Entity('shifts')
 export class Shift {
+  toJSON(): any {
+    throw new Error("Method not implemented.");
+  }
   @PrimaryGeneratedColumn('uuid')
   id: string;
 

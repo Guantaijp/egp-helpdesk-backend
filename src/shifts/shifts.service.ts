@@ -1,32 +1,46 @@
-import { Injectable, NotFoundException } from "@nestjs/common"
-import { InjectRepository } from "@nestjs/typeorm"
-import type { Repository } from "typeorm"
+import { Injectable, NotFoundException, Logger } from "@nestjs/common"
+import { InjectModel } from '@nestjs/sequelize'
+import { Shift } from "./models/shift.model"
 import type { CreateShiftDto } from "./dto/create-shift.dto"
 import type { UpdateShiftDto } from "./dto/update-shift.dto"
-import { Shift } from "./entities/shift.entity"
 
 @Injectable()
 export class ShiftsService {
-  constructor(
-    @InjectRepository(Shift)
-    private shiftRepository: Repository<Shift>,
-  ) {
-  }
+  private readonly logger = new Logger(ShiftsService.name)
 
-   async create(createShiftDto: CreateShiftDto): Promise<Shift> {
-    // Cast DTO as partial Shift, so typescript is happy
-    const shift = this.shiftRepository.create(createShiftDto as Partial<Shift>);
-    return await this.shiftRepository.save(shift);
+  constructor(@InjectModel(Shift) private shiftModel: typeof Shift) {}
+
+  async create(createShiftDto: CreateShiftDto): Promise<Shift> {
+    this.logger.log(`Creating shift with data: ${JSON.stringify(createShiftDto)}`)
+    this.logger.log(`Name received: "${createShiftDto.shiftName}"`)
+
+    try {
+      const shift = await this.shiftModel.create({
+        shiftName: createShiftDto.shiftName,
+        description: createShiftDto.description ?? "",
+        color: createShiftDto.color,
+        startTime: createShiftDto.startTime,
+        endTime: createShiftDto.endTime,
+        days: createShiftDto.days,
+        requiredAgents: createShiftDto.requiredAgents,
+      } as any)
+
+      this.logger.log(`Shift created successfully: ${JSON.stringify(shift.toJSON())}`)
+      return shift
+    } catch (error) {
+      this.logger.error(`Error creating shift: ${error.message}`)
+      throw error
+    }
   }
 
   async findAll(): Promise<Shift[]> {
-    return await this.shiftRepository.find({
-      order: { createdAt: "DESC" },
+    return this.shiftModel.findAll({
+      order: [["createdAt", "DESC"]],
     })
   }
 
   async findOne(id: string): Promise<Shift> {
-    const shift = await this.shiftRepository.findOne({ where: { id } })
+    const shift = await this.shiftModel.findByPk(id)
     if (!shift) {
       throw new NotFoundException(`Shift with ID ${id} not found`)
     }
@@ -34,13 +48,21 @@ export class ShiftsService {
   }
 
   async update(id: string, updateShiftDto: UpdateShiftDto): Promise<Shift> {
+    this.logger.log(`Updating shift ${id} with data: ${JSON.stringify(updateShiftDto)}`)
+
     const shift = await this.findOne(id)
-    Object.assign(shift, updateShiftDto)
-    return await this.shiftRepository.save(shift)
+
+    await shift.update({
+      ...updateShiftDto,
+    })
+
+    this.logger.log(`Shift updated successfully: ${JSON.stringify(shift.toJSON())}`)
+    return shift
   }
 
   async remove(id: string): Promise<void> {
     const shift = await this.findOne(id)
-    await this.shiftRepository.remove(shift)
+    await shift.destroy()
+    this.logger.log(`Shift ${id} deleted successfully`)
   }
 }
