@@ -1,34 +1,40 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from "typeorm"
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
-@Entity("shifts")
+@Entity('shifts')
 export class Shift {
-  @PrimaryGeneratedColumn("uuid")
-  id: string
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
-  @Column({ type: "varchar", length: 255 })
-  name: string
+   @Column({ name: "shiftName", type: "varchar", length: 255 }) 
+  shiftName: string;
 
-  @Column({ type: "text", nullable: true })
-  description: string
+  @Column({ type: 'text', nullable: true })
+  description?: string;
 
-  @Column({ type: "varchar", length: 7 })
-  color: string
+  @Column({ type: 'varchar', length: 7 })
+  color: string;
 
-  @Column({ type: "time" })
-  startTime: string
+  @Column({ type: 'time' })
+  startTime: string;
 
-  @Column({ type: "time" })
-  endTime: string
+  @Column({ type: 'time' })
+  endTime: string;
 
-  @Column({ type: "simple-array" })
-  days: string[]
+  @Column('simple-array')
+  days: string[];
 
-  @Column({ type: "int", default: 1 })
-  requiredAgents: number
+  @Column({ type: 'int', default: 1 })
+  requiredAgents: number;
 
   @CreateDateColumn()
-  createdAt: Date
+  createdAt: Date;
 
   @UpdateDateColumn()
-  updatedAt: Date
+  updatedAt: Date;
 }

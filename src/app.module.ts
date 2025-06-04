@@ -1,4 +1,4 @@
-import { Module } from "@nestjs/common"
+import { Module, type MiddlewareConsumer, type NestModule } from "@nestjs/common"
 import { ConfigModule } from "@nestjs/config"
 import { ShiftsModule } from "./shifts/shifts.module"
 import { DatabaseModule } from "./database/database.module"
@@ -12,4 +12,9 @@ import { DatabaseModule } from "./database/database.module"
     ShiftsModule,
   ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    // configure middleware here if needed
+  }
+}
+

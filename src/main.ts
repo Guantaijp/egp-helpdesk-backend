@@ -1,10 +1,13 @@
 import { NestFactory } from "@nestjs/core"
-import { ValidationPipe } from "@nestjs/common"
+import { ValidationPipe, Logger } from "@nestjs/common"
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger"
 import { AppModule } from "./app.module"
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule)
+  const logger = new Logger("Bootstrap")
+  const app = await NestFactory.create(AppModule, {
+    logger: ["error", "warn", "log", "debug", "verbose"],
+  })
 
   // Enable CORS for frontend
   app.enableCors({
@@ -13,12 +16,19 @@ async function bootstrap() {
     credentials: true,
   })
 
-  // Global validation pipe
+  // Global validation pipe with debug logging
   app.useGlobalPipes(
     new ValidationPipe({
-      whitelist: true,
-      forbidNonWhitelisted: true,
+      whitelist: false, // Don't strip non-whitelisted properties
+      forbidNonWhitelisted: false, // Don't throw errors for non-whitelisted properties
       transform: true,
+      transformOptions: {
+        enableImplicitConversion: true,
+      },
+      exceptionFactory: (errors) => {
+        logger.debug(`Validation errors: ${JSON.stringify(errors)}`)
+        return errors
+      },
     }),
   )
 
@@ -34,7 +44,7 @@ async function bootstrap() {
   SwaggerModule.setup("api", app, document)
 
   await app.listen(3001)
-  console.log("🚀 Server running on http://localhost:3001")
-  console.log("📚 API Documentation: http://localhost:3001/api")
+  logger.log("🚀 Server running on http://localhost:3001")
+  logger.log("📚 API Documentation: http://localhost:3001/api")
 }
 bootstrap()

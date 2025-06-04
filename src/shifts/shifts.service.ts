@@ -7,18 +7,16 @@ import { Shift } from "./entities/shift.entity"
 
 @Injectable()
 export class ShiftsService {
-  private shiftRepository: Repository<Shift>
-
   constructor(
     @InjectRepository(Shift)
-    shiftRepository: Repository<Shift>,
+    private shiftRepository: Repository<Shift>,
   ) {
-    this.shiftRepository = shiftRepository;
   }
 
-  async create(createShiftDto: CreateShiftDto): Promise<Shift> {
-    const shift = this.shiftRepository.create(createShiftDto)
-    return await this.shiftRepository.save(shift)
+   async create(createShiftDto: CreateShiftDto): Promise<Shift> {
+    // Cast DTO as partial Shift, so typescript is happy
+    const shift = this.shiftRepository.create(createShiftDto as Partial<Shift>);
+    return await this.shiftRepository.save(shift);
   }
 
   async findAll(): Promise<Shift[]> {
